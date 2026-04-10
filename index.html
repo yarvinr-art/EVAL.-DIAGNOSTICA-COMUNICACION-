@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>IE N° 0148 | Evaluación Diagnóstica - Comunicación 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0f1117; color: #f1f5f9; line-height: 1.5; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #1e212c; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #f97316; border-radius: 10px; }
+        .header { background: rgba(22,25,34,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid #2a2e3d; position: sticky; top: 0; z-index: 100; padding: 16px 24px; }
+        .header-container { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+        .logo-area { display: flex; align-items: center; gap: 16px; }
+        .logo-icon { width: 48px; height: 48px; background: linear-gradient(135deg, #f97316, #ea580c); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; }
+        .title h1 { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; background: linear-gradient(135deg, #fff, #94a3b8); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .title p { font-size: 11px; color: #f97316; letter-spacing: 1px; }
+        .status-badge { background: #1e212c; padding: 6px 16px; border-radius: 40px; border: 1px solid #2a2e3d; font-size: 12px; display: flex; align-items: center; gap: 8px; }
+        .sync-dot { width: 10px; height: 10px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+        .main { max-width: 1400px; margin: 0 auto; padding: 24px; }
+        .card { background: #161922; border: 1px solid #2a2e3d; border-radius: 20px; margin-bottom: 28px; overflow: hidden; }
+        .card-header { padding: 18px 24px; background: #1a1d27; border-bottom: 1px solid #2a2e3d; display: flex; align-items: center; gap: 12px; }
+        .card-icon { width: 40px; height: 40px; background: rgba(249,115,22,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .card-header h2 { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; }
+        .card-body { padding: 24px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 24px; }
+        .input-group label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; color: #5b6a8c; margin-bottom: 6px; letter-spacing: 0.5px; }
+        .input-group select, .input-group input { width: 100%; padding: 12px 14px; background: #1e212c; border: 1px solid #2a2e3d; border-radius: 12px; color: #f1f5f9; font-size: 14px; font-weight: 500; cursor: pointer; }
+        .input-group select:focus, .input-group input:focus { outline: none; border-color: #f97316; box-shadow: 0 0 0 3px rgba(249,115,22,0.2); }
+        .btn-group { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
+        .btn { padding: 12px 24px; border-radius: 12px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary { background: linear-gradient(135deg, #f97316, #ea580c); color: white; }
+        .btn-primary:hover { transform: translateY(-2px); }
+        .btn-secondary { background: #1e212c; color: #94a3b8; border: 1px solid #2a2e3d; }
+        .btn-secondary:hover { border-color: #f97316; color: #f97316; transform: translateY(-2px); }
+        .btn-success { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.25); }
+        .btn-success:hover { background: rgba(16,185,129,0.25); transform: translateY(-2px); }
+        .btn-info { background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.25); }
+        .btn-info:hover { background: rgba(99,102,241,0.25); transform: translateY(-2px); }
+        .table-wrapper { overflow-x: auto; border-radius: 12px; max-height: 600px; overflow-y: auto; }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .data-table th { background: #1e212c; padding: 12px 8px; text-align: center; font-size: 10px; font-weight: 600; text-transform: uppercase; color: #5b6a8c; position: sticky; top: 0; z-index: 10; }
+        .data-table th:first-child { text-align: left; position: sticky; left: 0; background: #1e212c; z-index: 20; }
+        .data-table td { padding: 8px; text-align: center; border-bottom: 1px solid #2a2e3d; }
+        .data-table td:first-child { text-align: left; font-weight: 500; position: sticky; left: 0; background: #161922; }
+        .data-table select { width: 110px; padding: 6px; background: #1e212c; border: 1px solid #2a2e3d; border-radius: 6px; color: #f1f5f9; font-size: 11px; }
+        .student-input { width: 200px !important; text-align: left !important; }
+        .charts-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; margin-bottom: 28px; }
+        .chart-card { background: #1a1d27; border-radius: 16px; padding: 20px; border: 1px solid #2a2e3d; }
+        .chart-title { font-size: 14px; font-weight: 700; text-transform: uppercase; color: #5b6a8c; margin-bottom: 20px; text-align: center; }
+        .chart-container { height: 280px; position: relative; }
+        .refuerzo-card { background: #1e212c; border-radius: 16px; padding: 20px; margin-top: 20px; border-left: 4px solid #f97316; }
+        .refuerzo-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 20px; }
+        .stat-box { background: #161922; border-radius: 12px; padding: 16px; text-align: center; border: 1px solid #2a2e3d; }
+        .stat-number { font-size: 28px; font-weight: 800; color: #f97316; }
+        .footer { text-align: center; padding: 24px; border-top: 1px solid #2a2e3d; background: #161922; margin-top: 20px; }
+        .footer-name { font-weight: 700; color: #f97316; margin-bottom: 4px; }
+        .footer-cargo, .footer-version { font-size: 12px; color: #5b6a8c; }
+        .tab-buttons { display: flex; gap: 4px; background: #1a1d27; border-bottom: 1px solid #2a2e3d; padding: 0 20px; }
+        .tab-btn { padding: 14px 24px; font-size: 12px; font-weight: 600; text-transform: uppercase; cursor: pointer; color: #5b6a8c; border-bottom: 2px solid transparent; }
+        .tab-btn.active { color: #f97316; border-bottom-color: #f97316; }
+        .tab-pane { display: none; padding: 24px; }
+        .tab-pane.active { display: block; }
+
+        /* ── TOAST ── */
+        #toastContainer { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { background: #1e212c; border: 1px solid #2a2e3d; border-left: 4px solid #f97316; border-radius: 12px; padding: 14px 20px; font-size: 13px; font-weight: 500; color: #f1f5f9; box-shadow: 0 8px 24px rgba(0,0,0,0.4); opacity: 0; transform: translateX(60px); transition: all 0.35s cubic-bezier(.4,0,.2,1); pointer-events: auto; max-width: 340px; }
+        .toast.show { opacity: 1; transform: translateX(0); }
+        .toast.success { border-left-color: #10b981; }
+        .toast.error   { border-left-color: #ef4444; }
+        .toast.info    { border-left-color: #818cf8; }
+
+        /* ── IMPORTAR ── */
+        #inputImportar { display: none; }
+        .drop-zone { border: 2px dashed #2a2e3d; border-radius: 12px; padding: 20px; text-align: center; color: #5b6a8c; font-size: 13px; margin-top: 12px; cursor: pointer; transition: border-color 0.2s; }
+        .drop-zone:hover { border-color: #f97316; color: #f97316; }
+
+        /* ── VIRTUAL SCROLL ── */
+        .virtual-scroll-container { max-height: 600px; overflow-y: auto; border-radius: 12px; }
+
+        @media (max-width: 900px) { .main { padding: 16px; } .charts-row { grid-template-columns: 1fr; } .student-input { width: 140px !important; } }
+        @media print { body { background: white; color: black; } .btn, .btn-group, .status-badge, .footer { display: none; } }
+    </style>
+</head>
+<body>
+
+<div id="toastContainer"></div>
+
+<div class="header">
+    <div class="header-container">
+        <div class="logo-area">
+            <div class="logo-icon">IE</div>
+            <div class="title">
+                <h1>IE N° 0148 VÍCTOR RAÚL HAYA DE LA TORRE</h1>
+                <p>EVALUACIÓN DIAGNÓSTICA DE ENTRADA - COMUNICACIÓN 2026</p>
+            </div>
+        </div>
+        <div class="status-badge" id="statusBadge"><span class="sync-dot" id="syncDot" style="background:#f97316;box-shadow:0 0 8px #f97316;"></span> <span id="statusText">Conectando...</span></div>
+    </div>
+</div>
+
+<div class="main">
+    <!-- CONFIGURACIÓN -->
+    <div class="card">
+        <div class="card-header"><div class="card-icon">⚙️</div><h2>CONFIGURACIÓN</h2></div>
+        <div class="card-body">
+            <div class="grid-4">
+                <div class="input-group"><label>📚 GRADO</label>
+                    <select id="grado">
+                        <option>1°</option><option>2°</option><option>3°</option><option>4°</option><option>5°</option>
+                    </select>
+                </div>
+                <div class="input-group"><label>📌 SECCIÓN</label>
+                    <select id="seccion">
+                        <option>A</option><option>B</option><option>C</option><option>D</option><option>E</option>
+                    </select>
+                </div>
+                <div class="input-group"><label>📖 EVALUACIÓN</label>
+                    <select id="tipoEvaluacion">
+                        <option value="lectura">LECTURA (A,B,C,D,N/R)</option>
+                        <option value="escritura">ESCRITURA (Adecuada/Parcial/Inadecuada)</option>
+                    </select>
+                </div>
+                <div class="input-group"><label>👥 TOTAL ALUMNOS</label>
+                    <input type="number" id="totalAlumnos" min="1" max="800" value="25">
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary"   id="btnGenerar">📋 GENERAR TABLA</button>
+                <button class="btn btn-success"   id="btnGuardar">💾 GUARDAR</button>
+                <button class="btn btn-secondary" id="btnExportarExcel">📊 EXPORTAR EXCEL</button>
+                <button class="btn btn-info"      id="btnImportar">📥 IMPORTAR EXCEL</button>
+                <input type="file" id="inputImportar" accept=".xlsx,.xls,.csv">
+            </div>
+        </div>
+    </div>
+
+    <!-- ESTUDIANTES -->
+    <div class="card" id="cardEstudiantes" style="display:none;">
+        <div class="card-header"><div class="card-icon">👥</div><h2>REGISTRO DE ESTUDIANTES</h2></div>
+        <div class="card-body">
+            <div class="table-wrapper">
+                <table class="data-table">
+                    <thead><tr><th>#</th><th>NOMBRES Y APELLIDOS</th><th>ACCIONES</th></tr></thead>
+                    <tbody id="tbodyEstudiantes"></tbody>
+                </table>
+            </div>
+            <div class="btn-group" style="margin-top:16px;">
+                <button class="btn btn-secondary" id="btnAgregarEstudiante">➕ AGREGAR ESTUDIANTE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EVALUACIÓN -->
+    <div class="card" id="cardEvaluacion" style="display:none;">
+        <div class="card-header"><div class="card-icon">📝</div><h2 id="tituloEvaluacion">EVALUACIÓN DE LECTURA</h2></div>
+        <div class="card-body"><div class="table-wrapper" id="wrapperEvaluacion"></div></div>
+    </div>
+
+    <!-- RESULTADOS -->
+    <div class="card" id="cardResultados" style="display:none;">
+        <div class="tab-buttons">
+            <div class="tab-btn active" data-tab="Graficos">📊 GRÁFICOS</div>
+            <div class="tab-btn" data-tab="Refuerzo">🎯 REFUERZO ESCOLAR</div>
+            <div class="tab-btn" data-tab="Detalle">📋 RESUMEN</div>
+        </div>
+        <div id="tabGraficos" class="tab-pane active">
+            <div class="charts-row">
+                <div class="chart-card"><div class="chart-title" id="chartTitlePorcentaje">PORCENTAJE DE RESPUESTAS</div><div class="chart-container"><canvas id="chartPorcentaje"></canvas></div></div>
+                <div class="chart-card"><div class="chart-title" id="chartTitleCantidad">CANTIDAD DE RESPUESTAS</div><div class="chart-container"><canvas id="chartCantidad"></canvas></div></div>
+            </div>
+        </div>
+        <div id="tabRefuerzo" class="tab-pane"><div id="contenidoRefuerzo"></div></div>
+        <div id="tabDetalle" class="tab-pane"><div id="contenidoDetalle"></div></div>
+    </div>
+</div>
+
+<div class="footer">
+    <div class="footer-name">Elaborado por: Yarvin RS</div>
+    <div class="footer-cargo">Profesor de innovación pedagógica</div>
+    <div class="footer-version">Sistema optimizado v2 | Datos guardados localmente | Soporte hasta 800 estudiantes</div>
+</div>
+
+<!-- Firebase compat (debe cargarse antes del script principal) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<script>
+/* ═══════════════════════════════════════
+   DATOS DE LECTURA (1° a 5°)
+   Cada texto tiene exactamente 6 preguntas
+   5° ahora con textos reales
+═══════════════════════════════════════ */
+const lecturaData = {
+    "1°": { textos: [
+        { nombre: "La Escuela Italiana del Renacimiento", preguntas: ["C","C","B","C","A","A"] },
+        { nombre: "Cartas al alcalde",                   preguntas: ["C","A","B","C","C","D"] },
+        { nombre: "La mujer canario",                    preguntas: ["B","B","D","B","B","C"] }
+    ]},
+    "2°": { textos: [
+        { nombre: "Fabricación del papel reciclado", preguntas: ["A","A","C","B","D","C"] },
+        { nombre: "Impacto de los plásticos",        preguntas: ["C","D","A","D","A","C"] },
+        { nombre: "Educación virtual",               preguntas: ["B","A","C","A","C","A"] }
+    ]},
+    "3°": { textos: [
+        { nombre: "La irrupción de lo mágico", preguntas: ["B","C","A","B","B","C"] },
+        { nombre: "El geógrafo",               preguntas: ["B","A","A","B","B","A"] },
+        { nombre: "Hoteles flotantes",         preguntas: ["C","A","B","D","A","C"] }
+    ]},
+    "4°": { textos: [
+        { nombre: "La ciencia en la era de la IA",  preguntas: ["D","D","A","C","A","D"] },
+        { nombre: "La sequía en el Altiplano",      preguntas: ["A","B","D","C","B","A"] },
+        { nombre: "Tres pasos para tu carrera",     preguntas: ["A","C","D","D","A","C"] }
+    ]},
+    "5°": { textos: [
+        { nombre: "El megapuerto de Chancay - El atractivo del puerto de Chancay", preguntas: ["C","B","D","A","C","B"] },
+        { nombre: "Las personas en el PEN al 2036 - Jóvenes y adultos",            preguntas: ["B","D","A","B","C","A"] },
+        { nombre: "Educación financiera acceso a servicios para todos los peruanos",preguntas: ["A","C","C","C","C","B"] }
+    ]}
+};
+
+const escrituraPreguntas = [
+    "Adecúa el texto a la situación comunicativa",
+    "Organiza y desarrolla las ideas de forma coherente y cohesionada",
+    "Utiliza convenciones del lenguaje escrito de forma pertinente",
+    "Elige estratégicamente el registro formal o informal",
+    "Ordena las ideas sin digresiones ni contradicciones",
+    "Establece relaciones lógicas usando conectores"
+];
+
+/* ═══════════════════════════════════════  ESTADO  ═══════════════════════════════════════ */
+let estudiantes        = [];
+let respuestasLectura  = {};
+let respuestasEscritura= {};
+let currentGrado   = "1°";
+let currentSeccion = "A";
+let currentTipo    = "lectura";
+let chartPorcentaje= null;
+let chartCantidad  = null;
+
+/* ═══════════════════════════════════════  TOAST  ════════════════════════════════════════ */
+function mostrarToast(msg, tipo = "default") {
+    const container = document.getElementById("toastContainer");
+    const t = document.createElement("div");
+    t.className = `toast ${tipo}`;
+    t.textContent = msg;
+    container.appendChild(t);
+    requestAnimationFrame(() => { requestAnimationFrame(() => { t.classList.add("show"); }); });
+    setTimeout(() => { t.classList.remove("show"); setTimeout(() => t.remove(), 400); }, 3500);
+}
+
+/* ═══════════════════════════════════════  CHARTS  ═══════════════════════════════════════ */
+function destroyCharts() {
+    if(chartPorcentaje) { chartPorcentaje.destroy(); chartPorcentaje = null; }
+    if(chartCantidad)   { chartCantidad.destroy();   chartCantidad   = null; }
+}
+
+/* ═══════════════════════════════════════  RENDER ESTUDIANTES  ═══════════════════════════ */
+function renderEstudiantes() {
+    const tbody = document.getElementById("tbodyEstudiantes");
+    if(!tbody) return;
+    // Renderizado eficiente: construir HTML de una vez
+    const rows = estudiantes.map((e, idx) => `
+        <tr>
+            <td>${idx + 1}</td>
+            <td><input type="text" class="student-input" value="${escHtml(e.nombre || '')}" placeholder="Nombre completo" onchange="actualizarNombreEstudiante(this,${idx})"></td>
+            <td><button class="btn btn-secondary" style="padding:4px 12px;" onclick="eliminarEstudiante(${idx})">🗑️</button></td>
+        </tr>`).join('');
+    tbody.innerHTML = rows;
+}
+
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+window.actualizarNombreEstudiante = (input, idx) => {
+    estudiantes[idx].nombre = input.value;
+    renderEvaluacion();
+    actualizarResultados();
+};
+
+window.eliminarEstudiante = (idx) => {
+    estudiantes.splice(idx, 1);
+    // Reasignar respuestas
+    const newLec = {}, newEsc = {};
+    for(let i = 0; i < estudiantes.length; i++) {
+        const oldI = i < idx ? i : i + 1;
+        if(respuestasLectura[oldI])   newLec[i] = respuestasLectura[oldI];
+        if(respuestasEscritura[oldI]) newEsc[i] = respuestasEscritura[oldI];
+    }
+    respuestasLectura  = newLec;
+    respuestasEscritura= newEsc;
+    renderEstudiantes();
+    renderEvaluacion();
+    actualizarResultados();
+};
+
+window.cambiarRespuestaLectura = (estIdx, preguntaIdx, valor) => {
+    if(!respuestasLectura[estIdx]) respuestasLectura[estIdx] = {};
+    respuestasLectura[estIdx][preguntaIdx] = valor;
+    actualizarResultados();
+};
+
+window.cambiarRespuestaEscritura = (estIdx, preguntaIdx, valor) => {
+    if(!respuestasEscritura[estIdx]) respuestasEscritura[estIdx] = {};
+    respuestasEscritura[estIdx][preguntaIdx] = valor;
+    actualizarResultados();
+};
+
+/* ═══════════════════════════════════════  RENDER EVALUACIÓN  ════════════════════════════ */
+function renderEvaluacion() {
+    const wrapper = document.getElementById("wrapperEvaluacion");
+    if(!wrapper) return;
+
+    if(currentTipo === "escritura") {
+        let html = '<table class="data-table"><thead><tr><th>ESTUDIANTE</th>';
+        for(let i = 0; i < escrituraPreguntas.length; i++) {
+            html += `<th title="${escHtml(escrituraPreguntas[i])}">${escHtml(escrituraPreguntas[i].substring(0,30))}…</th>`;
+        }
+        html += '</tr></thead><tbody>';
+        for(let i = 0; i < estudiantes.length; i++) {
+            html += `<tr><td style="font-weight:bold;">${escHtml(estudiantes[i].nombre || 'Sin nombre')}</td>`;
+            for(let p = 0; p < escrituraPreguntas.length; p++) {
+                const val = respuestasEscritura[i]?.[p] || "";
+                html += `<td><select onchange="cambiarRespuestaEscritura(${i},${p},this.value)">
+                    <option value="">SELECCIONE</option>
+                    <option value="ADECUADA"      ${val==='ADECUADA'?'selected':''}>✅ ADECUADA</option>
+                    <option value="PARCIAL"       ${val==='PARCIAL'?'selected':''}>⚠️ PARCIAL</option>
+                    <option value="INADECUADA"    ${val==='INADECUADA'?'selected':''}>❌ INADECUADA</option>
+                    <option value="NO RESPONDIDO" ${val==='NO RESPONDIDO'?'selected':''}>📭 NO RESPONDIDO</option>
+                </select></td>`;
+            }
+            html += '</tr>';
+        }
+        html += '</tbody></table>';
+        wrapper.innerHTML = html;
+        return;
+    }
+
+    const data = lecturaData[currentGrado];
+    if(!data || !data.textos) { wrapper.innerHTML = '<p>No hay datos para este grado</p>'; return; }
+
+    let html = '<table class="data-table"><thead><tr><th>ESTUDIANTE</th>';
+    for(let t = 0; t < data.textos.length; t++) {
+        for(let p = 0; p < data.textos[t].preguntas.length; p++) {
+            html += `<th>${escHtml(data.textos[t].nombre)}<br>P${p+1}<br><small style="color:#10b981;font-size:9px;">✓${data.textos[t].preguntas[p]}</small></th>`;
+        }
+    }
+    html += '</tr></thead><tbody>';
+
+    for(let estIdx = 0; estIdx < estudiantes.length; estIdx++) {
+        html += `<tr><td style="font-weight:bold;">${escHtml(estudiantes[estIdx].nombre || 'Sin nombre')}</td>`;
+        let pIdx = 0;
+        for(let t = 0; t < data.textos.length; t++) {
+            for(let p = 0; p < data.textos[t].preguntas.length; p++) {
+                const val = respuestasLectura[estIdx]?.[pIdx] || "";
+                const correcta = data.textos[t].preguntas[p];
+                let bg = "";
+                if(val && val === correcta) bg = 'style="background:rgba(16,185,129,0.12);"';
+                else if(val && val !== correcta) bg = 'style="background:rgba(239,68,68,0.10);"';
+                html += `<td ${bg}><select onchange="cambiarRespuestaLectura(${estIdx},${pIdx},this.value)">
+                    <option value="">N/R</option>
+                    <option value="A" ${val==='A'?'selected':''}>A</option>
+                    <option value="B" ${val==='B'?'selected':''}>B</option>
+                    <option value="C" ${val==='C'?'selected':''}>C</option>
+                    <option value="D" ${val==='D'?'selected':''}>D</option>
+                </select></td>`;
+                pIdx++;
+            }
+        }
+        html += '</tr>';
+    }
+    html += '</tbody></table>';
+    wrapper.innerHTML = html;
+}
+
+/* ═══════════════════════════════════════  RESULTADOS  ═══════════════════════════════════ */
+function actualizarResultados() {
+    setTimeout(() => {
+        if(currentTipo === "lectura") renderResultadosLectura();
+        else renderResultadosEscritura();
+    }, 50);
+}
+
+function renderResultadosLectura() {
+    const data = lecturaData[currentGrado];
+    if(!data) return;
+
+    let correctas = 0, incorrectas = 0, nrcount = 0, totalResp = 0;
+    for(let estIdx = 0; estIdx < estudiantes.length; estIdx++) {
+        let pIdx = 0;
+        for(let t = 0; t < data.textos.length; t++) {
+            for(let p = 0; p < data.textos[t].preguntas.length; p++) {
+                const resp = respuestasLectura[estIdx]?.[pIdx] || "";
+                const correcta = data.textos[t].preguntas[p];
+                totalResp++;
+                if(resp === "") nrcount++;
+                else if(resp === correcta) correctas++;
+                else incorrectas++;
+                pIdx++;
+            }
+        }
+    }
+
+    const pctC  = totalResp > 0 ? (correctas  / totalResp * 100).toFixed(1) : 0;
+    const pctI  = totalResp > 0 ? (incorrectas/ totalResp * 100).toFixed(1) : 0;
+    const pctNR = totalResp > 0 ? (nrcount    / totalResp * 100).toFixed(1) : 0;
+
+    document.getElementById("chartTitlePorcentaje").innerHTML = `📖 LECTURA - ${currentGrado} "${currentSeccion}" - PORCENTAJE`;
+    document.getElementById("chartTitleCantidad").innerHTML   = `📖 LECTURA - ${currentGrado} "${currentSeccion}" - CANTIDAD`;
+
+    destroyCharts();
+    chartPorcentaje = new Chart(document.getElementById("chartPorcentaje"), {
+        type:"bar",
+        data:{ labels:["✅ CORRECTA","❌ INCORRECTA","📭 NO RESPONDIÓ"],
+               datasets:[{ label:"Porcentaje (%)", data:[pctC,pctI,pctNR], backgroundColor:["#10b981","#ef4444","#6b7280"] }] },
+        options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{ max:100, title:{ display:true, text:"%" } } } }
+    });
+    chartCantidad = new Chart(document.getElementById("chartCantidad"), {
+        type:"bar",
+        data:{ labels:["✅ CORRECTA","❌ INCORRECTA","📭 NO RESPONDIÓ"],
+               datasets:[{ label:"Cantidad", data:[correctas,incorrectas,nrcount], backgroundColor:["#10b981","#ef4444","#6b7280"] }] },
+        options:{ responsive:true, maintainAspectRatio:false }
+    });
+
+    const totalPreguntas = data.textos.reduce((a,t)=>a+t.preguntas.length,0);
+    const refuerzoList = [], okList = [], sinDatos = [];
+    for(let estIdx = 0; estIdx < estudiantes.length; estIdx++) {
+        let inc = 0, cor = 0, nr = 0; let pIdx = 0;
+        for(let t = 0; t < data.textos.length; t++) {
+            for(let p = 0; p < data.textos[t].preguntas.length; p++) {
+                const resp = respuestasLectura[estIdx]?.[pIdx] || "";
+                if(resp === "") nr++;
+                else if(resp === data.textos[t].preguntas[p]) cor++;
+                else inc++;
+                pIdx++;
+            }
+        }
+        const respondidas = cor + inc;
+        const nombre = estudiantes[estIdx].nombre || 'Sin nombre';
+        if(respondidas === 0) { sinDatos.push(nombre); continue; }
+        const pctInc = (inc / totalPreguntas) * 100;
+        const pctNR  = (nr  / totalPreguntas) * 100;
+        const pctCor = (cor / totalPreguntas) * 100;
+        // Criterio: >50% incorrectas O >33% no respondidas
+        if(pctInc > 50 || (pctInc + pctNR) > 50) {
+            const nivel = pctCor >= 40 ? '🟡 RIESGO' : '🔴 CRÍTICO';
+            refuerzoList.push({ nombre, inc, cor, nr, pctCor: pctCor.toFixed(0), nivel });
+        } else {
+            okList.push({ nombre, inc, cor, nr, pctCor: pctCor.toFixed(0) });
+        }
+    }
+
+    document.getElementById("contenidoRefuerzo").innerHTML = `
+        <div class="refuerzo-card">
+            <h3>🎯 ESTUDIANTES QUE NECESITAN REFUERZO ESCOLAR</h3>
+            <p style="font-size:12px;color:#94a3b8;margin:8px 0 16px;">
+                Criterio: requiere refuerzo si más del <strong style="color:#f97316;">50% de respuestas son incorrectas o no respondidas</strong>
+                (${totalPreguntas} preguntas en total).
+            </p>
+            <div class="refuerzo-stats">
+                <div class="stat-box"><div class="stat-number" style="color:#ef4444;">${refuerzoList.length}</div><div>Requieren refuerzo</div></div>
+                <div class="stat-box"><div class="stat-number" style="color:#10b981;">${okList.length}</div><div>En nivel esperado</div></div>
+                <div class="stat-box"><div class="stat-number">${estudiantes.length > 0 ? ((refuerzoList.length/estudiantes.length)*100).toFixed(1) : 0}%</div><div>% del aula en refuerzo</div></div>
+            </div>
+            ${refuerzoList.length > 0 ? `
+            <table class="data-table" style="margin-bottom:20px;">
+                <thead><tr><th>#</th><th>ESTUDIANTE</th><th>✅ CORRECTAS</th><th>❌ INCORRECTAS</th><th>📭 N/R</th><th>% LOGRO</th><th>NIVEL</th></tr></thead>
+                <tbody>${refuerzoList.map((e,i)=>`<tr>
+                    <td>${i+1}</td>
+                    <td style="text-align:left;">${escHtml(e.nombre)}</td>
+                    <td style="color:#10b981;">${e.cor}</td>
+                    <td style="color:#ef4444;">${e.inc}</td>
+                    <td style="color:#6b7280;">${e.nr}</td>
+                    <td><strong style="color:#f97316;">${e.pctCor}%</strong></td>
+                    <td>${e.nivel}</td>
+                </tr>`).join('')}</tbody>
+            </table>` : '<p style="color:#10b981;padding:12px 0;">✅ Ningún estudiante requiere refuerzo con el criterio actual.</p>'}
+            ${okList.length > 0 ? `
+            <details style="margin-top:12px;">
+                <summary style="cursor:pointer;color:#10b981;font-weight:600;padding:8px 0;">✅ ESTUDIANTES EN NIVEL ESPERADO (${okList.length})</summary>
+                <table class="data-table" style="margin-top:8px;">
+                    <thead><tr><th>#</th><th>ESTUDIANTE</th><th>✅ CORRECTAS</th><th>❌ INCORRECTAS</th><th>% LOGRO</th></tr></thead>
+                    <tbody>${okList.map((e,i)=>`<tr><td>${i+1}</td><td style="text-align:left;">${escHtml(e.nombre)}</td><td style="color:#10b981;">${e.cor}</td><td style="color:#ef4444;">${e.inc}</td><td><strong style="color:#10b981;">${e.pctCor}%</strong></td></tr>`).join('')}</tbody>
+                </table>
+            </details>` : ''}
+        </div>`;
+
+    document.getElementById("contenidoDetalle").innerHTML = `
+        <div class="refuerzo-card">
+            <h3>📋 RESUMEN GENERAL - LECTURA</h3>
+            <p>📚 Grado: ${currentGrado} | Sección: ${currentSeccion}</p>
+            <p>✅ Respuestas correctas: ${correctas} (${pctC}%)</p>
+            <p>❌ Respuestas incorrectas: ${incorrectas} (${pctI}%)</p>
+            <p>📭 No respondidas: ${nrcount} (${pctNR}%)</p>
+            <p>📊 Total de respuestas: ${totalResp}</p>
+            <p>👥 Estudiantes evaluados: ${estudiantes.length}</p>
+            <p>📝 Preguntas por estudiante: ${data.textos.reduce((a,t)=>a+t.preguntas.length,0)}</p>
+        </div>`;
+}
+
+function renderResultadosEscritura() {
+    let totalAdecuada=0, totalInadecuada=0, totalParcial=0, totalNoRespondido=0;
+    const totalPos = estudiantes.length * escrituraPreguntas.length;
+
+    for(let i = 0; i < estudiantes.length; i++) {
+        for(let p = 0; p < escrituraPreguntas.length; p++) {
+            const val = respuestasEscritura[i]?.[p] || "";
+            if(val==="ADECUADA")      totalAdecuada++;
+            else if(val==="INADECUADA") totalInadecuada++;
+            else if(val==="PARCIAL")    totalParcial++;
+            else                        totalNoRespondido++;
+        }
+    }
+
+    const pA = totalPos>0?(totalAdecuada   /totalPos*100).toFixed(1):0;
+    const pI = totalPos>0?(totalInadecuada /totalPos*100).toFixed(1):0;
+    const pP = totalPos>0?(totalParcial    /totalPos*100).toFixed(1):0;
+    const pN = totalPos>0?(totalNoRespondido/totalPos*100).toFixed(1):0;
+
+    document.getElementById("chartTitlePorcentaje").innerHTML = `✍️ ESCRITURA - ${currentGrado} "${currentSeccion}" - PORCENTAJE`;
+    document.getElementById("chartTitleCantidad").innerHTML   = `✍️ ESCRITURA - ${currentGrado} "${currentSeccion}" - CANTIDAD`;
+
+    destroyCharts();
+    chartPorcentaje = new Chart(document.getElementById("chartPorcentaje"), {
+        type:"bar",
+        data:{ labels:["✅ ADECUADA","❌ INADECUADA","⚠️ PARCIAL","📭 NO RESPONDIDO"],
+               datasets:[{ label:"Porcentaje (%)", data:[pA,pI,pP,pN], backgroundColor:["#10b981","#ef4444","#fbbf24","#6b7280"] }] },
+        options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{ max:100, title:{ display:true, text:"%" } } } }
+    });
+    chartCantidad = new Chart(document.getElementById("chartCantidad"), {
+        type:"bar",
+        data:{ labels:["✅ ADECUADA","❌ INADECUADA","⚠️ PARCIAL","📭 NO RESPONDIDO"],
+               datasets:[{ label:"Cantidad", data:[totalAdecuada,totalInadecuada,totalParcial,totalNoRespondido], backgroundColor:["#10b981","#ef4444","#fbbf24","#6b7280"] }] },
+        options:{ responsive:true, maintainAspectRatio:false }
+    });
+
+    const totalCriterios = escrituraPreguntas.length;
+    const refuerzoListE = [], okListE = [];
+    for(let i = 0; i < estudiantes.length; i++) {
+        let adecuada=0, parcial=0, inadecuada=0, nr=0;
+        for(let p = 0; p < totalCriterios; p++) {
+            const val = respuestasEscritura[i]?.[p] || "";
+            if(val==="ADECUADA")       adecuada++;
+            else if(val==="PARCIAL")   parcial++;
+            else if(val==="INADECUADA")inadecuada++;
+            else                       nr++;
+        }
+        const nombre = estudiantes[i].nombre || 'Sin nombre';
+        const respondidos = adecuada + parcial + inadecuada;
+        if(respondidos === 0) continue;
+
+        // Criterio: requiere refuerzo si inadecuada+NR > 2 criterios  O  parcial+inadecuada > 50%
+        const pctInadec  = (inadecuada / totalCriterios) * 100;
+        const pctParcial = (parcial    / totalCriterios) * 100;
+        const necesita   = (inadecuada + nr) >= 2 || (pctInadec + pctParcial) > 50;
+        let nivel = '🟡 RIESGO';
+        if(inadecuada >= 3 || (inadecuada + nr) >= 4) nivel = '🔴 CRÍTICO';
+        if(necesita) refuerzoListE.push({ nombre, adecuada, parcial, inadecuada, nr, nivel });
+        else         okListE.push({ nombre, adecuada, parcial, inadecuada });
+    }
+
+    document.getElementById("contenidoRefuerzo").innerHTML = `
+        <div class="refuerzo-card">
+            <h3>🎯 ESTUDIANTES QUE NECESITAN REFUERZO ESCOLAR</h3>
+            <p style="font-size:12px;color:#94a3b8;margin:8px 0 16px;">
+                Criterio: requiere refuerzo si tiene <strong style="color:#f97316;">2 o más criterios Inadecuados/No respondidos</strong>
+                o si más del <strong style="color:#f97316;">50% de criterios son Parcial+Inadecuado</strong>.
+            </p>
+            <div class="refuerzo-stats">
+                <div class="stat-box"><div class="stat-number" style="color:#ef4444;">${refuerzoListE.length}</div><div>Requieren refuerzo</div></div>
+                <div class="stat-box"><div class="stat-number" style="color:#10b981;">${okListE.length}</div><div>En nivel esperado</div></div>
+                <div class="stat-box"><div class="stat-number">${estudiantes.length > 0 ? ((refuerzoListE.length/estudiantes.length)*100).toFixed(1) : 0}%</div><div>% del aula en refuerzo</div></div>
+            </div>
+            ${refuerzoListE.length > 0 ? `
+            <table class="data-table" style="margin-bottom:20px;">
+                <thead><tr><th>#</th><th>ESTUDIANTE</th><th>✅ ADECUADA</th><th>⚠️ PARCIAL</th><th>❌ INADECUADA</th><th>📭 N/R</th><th>NIVEL</th></tr></thead>
+                <tbody>${refuerzoListE.map((e,i)=>`<tr>
+                    <td>${i+1}</td>
+                    <td style="text-align:left;">${escHtml(e.nombre)}</td>
+                    <td style="color:#10b981;">${e.adecuada}</td>
+                    <td style="color:#fbbf24;">${e.parcial}</td>
+                    <td style="color:#ef4444;">${e.inadecuada}</td>
+                    <td style="color:#6b7280;">${e.nr}</td>
+                    <td>${e.nivel}</td>
+                </tr>`).join('')}</tbody>
+            </table>` : '<p style="color:#10b981;padding:12px 0;">✅ Ningún estudiante requiere refuerzo con el criterio actual.</p>'}
+            ${okListE.length > 0 ? `
+            <details style="margin-top:12px;">
+                <summary style="cursor:pointer;color:#10b981;font-weight:600;padding:8px 0;">✅ ESTUDIANTES EN NIVEL ESPERADO (${okListE.length})</summary>
+                <table class="data-table" style="margin-top:8px;">
+                    <thead><tr><th>#</th><th>ESTUDIANTE</th><th>✅ ADECUADA</th><th>⚠️ PARCIAL</th><th>❌ INADECUADA</th></tr></thead>
+                    <tbody>${okListE.map((e,i)=>`<tr><td>${i+1}</td><td style="text-align:left;">${escHtml(e.nombre)}</td><td style="color:#10b981;">${e.adecuada}</td><td style="color:#fbbf24;">${e.parcial}</td><td style="color:#ef4444;">${e.inadecuada}</td></tr>`).join('')}</tbody>
+                </table>
+            </details>` : ''}
+        </div>`;
+
+    document.getElementById("contenidoDetalle").innerHTML = `
+        <div class="refuerzo-card">
+            <h3>📋 RESUMEN GENERAL - ESCRITURA</h3>
+            <p>📚 Grado: ${currentGrado} | Sección: ${currentSeccion}</p>
+            <p>✅ ADECUADA: ${totalAdecuada} (${pA}%)</p>
+            <p>⚠️ PARCIAL: ${totalParcial} (${pP}%)</p>
+            <p>❌ INADECUADA: ${totalInadecuada} (${pI}%)</p>
+            <p>📭 NO RESPONDIDO: ${totalNoRespondido} (${pN}%)</p>
+            <p>📊 Total respuestas posibles: ${totalPos}</p>
+            <p>👥 Estudiantes evaluados: ${estudiantes.length}</p>
+            <p>📝 Criterios por estudiante: ${escrituraPreguntas.length}</p>
+        </div>`;
+}
+
+/* ═══════════════════════════════════════  FIREBASE CONFIG  ══════════════════════════════ */
+/*
+  ┌─────────────────────────────────────────────────────────────────┐
+  │  INSTRUCCIONES PARA CONFIGURAR FIREBASE:                        │
+  │  1. Ve a https://console.firebase.google.com                    │
+  │  2. Crea un proyecto (ej: "evaluacion-ie0148")                  │
+  │  3. Ve a Realtime Database → Crear base de datos               │
+  │  4. En Reglas, pega:                                            │
+  │     { "rules": { ".read": true, ".write": true } }             │
+  │  5. Ve a Configuración del proyecto → Tus apps → Web (</>)     │
+  │  6. Copia los valores y pégalos abajo reemplazando los "xxx"    │
+  └─────────────────────────────────────────────────────────────────┘
+*/
+const firebaseConfig = {
+    apiKey:            "AIzaSyCQEaUTKMIadjLHSg1-y8NqOgCcSU-PIFs",
+    authDomain:        "eval-dignostica-com.firebaseapp.com",
+    databaseURL:       "https://eval-dignostica-com-default-rtdb.firebaseio.com",
+    projectId:         "eval-dignostica-com",
+    storageBucket:     "eval-dignostica-com.firebasestorage.app",
+    messagingSenderId: "230982162200",
+    appId:             "1:230982162200:web:474006eb795cf7234a706d"
+};
+
+let db = null;
+let firebaseOk = false;
+let listenerActivo = null;   // unsubscribe del listener en tiempo real
+let guardandoRemoto = false; // evita loop: escritura propia → listener → re-render
+
+function iniciarFirebase() {
+    try {
+        if (!firebaseConfig.databaseURL || firebaseConfig.databaseURL.includes("xxx")) {
+            setStatus("local", "⚠️ Sin Firebase — modo local");
+            return;
+        }
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.database();
+
+        // Verificar conexión
+        db.ref(".info/connected").on("value", snap => {
+            if (snap.val() === true) {
+                setStatus("online", "🟢 Firebase — En línea");
+                firebaseOk = true;
+            } else {
+                setStatus("offline", "🔴 Firebase — Sin conexión");
+                firebaseOk = false;
+            }
+        });
+    } catch(e) {
+        setStatus("local", "⚠️ Error Firebase — modo local");
+        console.warn("Firebase error:", e);
+    }
+}
+
+function setStatus(modo, texto) {
+    const dot  = document.getElementById("syncDot");
+    const span = document.getElementById("statusText");
+    if(!dot || !span) return;
+    span.textContent = texto;
+    const colores = { online:"#10b981", offline:"#ef4444", local:"#f97316", syncing:"#818cf8" };
+    dot.style.background  = colores[modo] || "#f97316";
+    dot.style.boxShadow   = `0 0 8px ${colores[modo] || "#f97316"}`;
+}
+
+function claveFirebase() {
+    return `eval_${currentGrado}_${currentSeccion}`.replace(/°/g, "");
+}
+
+/* ═══════════════════════════════════════  GUARDAR / CARGAR  ═════════════════════════════ */
+function cargarDatos() {
+    // Desuscribir listener anterior
+    if(listenerActivo) { listenerActivo(); listenerActivo = null; }
+
+    if(firebaseOk && db) {
+        setStatus("syncing", "🔄 Cargando...");
+        const ref = db.ref("evaluaciones/" + claveFirebase());
+
+        // Escucha en tiempo real: cada vez que otro profesor guarda, se actualiza
+        const handler = ref.on("value", snap => {
+            if(guardandoRemoto) return; // ignorar eco de escritura propia
+            const data = snap.val();
+            if(data) {
+                estudiantes         = data.estudiantes         || [];
+                respuestasLectura   = data.respuestasLectura   || {};
+                respuestasEscritura = data.respuestasEscritura || {};
+                mostrarToast(`☁️ Sincronizado: ${currentGrado} ${currentSeccion} (${estudiantes.length} estudiantes)`, "info");
+            } else {
+                estudiantes = []; respuestasLectura = {}; respuestasEscritura = {};
+                mostrarToast(`☁️ Nueva sección en Firebase: ${currentGrado} ${currentSeccion}`, "info");
+            }
+            renderEstudiantes();
+            renderEvaluacion();
+            actualizarResultados();
+            setStatus("online", "🟢 Firebase — En línea");
+        }, err => {
+            mostrarToast("❌ Error al leer Firebase: " + err.message, "error");
+            cargarLocal();
+        });
+
+        // Guardar referencia para poder desuscribir
+        listenerActivo = () => ref.off("value", handler);
+
+    } else {
+        cargarLocal();
+    }
+}
+
+function cargarLocal() {
+    const key   = `eval_${currentGrado}_${currentSeccion}`;
+    const saved = localStorage.getItem(key);
+    if(saved) {
+        const data = JSON.parse(saved);
+        estudiantes         = data.estudiantes         || [];
+        respuestasLectura   = data.respuestasLectura   || {};
+        respuestasEscritura = data.respuestasEscritura || {};
+        mostrarToast(`📂 Datos locales cargados: ${currentGrado} ${currentSeccion} (${estudiantes.length} est.)`, "info");
+    } else {
+        estudiantes = []; respuestasLectura = {}; respuestasEscritura = {};
+        mostrarToast(`📂 Nueva sección: ${currentGrado} ${currentSeccion}`, "info");
+    }
+    renderEstudiantes();
+    renderEvaluacion();
+    actualizarResultados();
+}
+
+function guardarTodo() {
+    const datos = { estudiantes, respuestasLectura, respuestasEscritura, actualizadoEn: new Date().toISOString() };
+
+    // Siempre guardar local como respaldo
+    localStorage.setItem(`eval_${currentGrado}_${currentSeccion}`, JSON.stringify(datos));
+
+    if(firebaseOk && db) {
+        setStatus("syncing", "🔄 Guardando...");
+        guardandoRemoto = true;
+        db.ref("evaluaciones/" + claveFirebase()).set(datos)
+            .then(() => {
+                guardandoRemoto = false;
+                setStatus("online", "🟢 Firebase — En línea");
+                mostrarToast(`✅ Guardado en la nube: ${currentGrado} ${currentSeccion}`, "success");
+            })
+            .catch(err => {
+                guardandoRemoto = false;
+                setStatus("offline", "🔴 Firebase — Sin conexión");
+                mostrarToast("⚠️ Error al guardar en nube (guardado local OK): " + err.message, "error");
+            });
+    } else {
+        mostrarToast(`💾 Guardado local: ${currentGrado} ${currentSeccion}`, "success");
+    }
+}
+
+// Iniciar Firebase al cargar la página
+iniciarFirebase();
+
+/* ═══════════════════════════════════════  GENERAR TABLA  ════════════════════════════════ */
+function generarTabla() {
+    const nuevoGrado   = document.getElementById("grado").value;
+    const nuevaSeccion = document.getElementById("seccion").value;
+    const nuevoTipo    = document.getElementById("tipoEvaluacion").value;
+
+    let recargar = false;
+    if(nuevoGrado !== currentGrado || nuevaSeccion !== currentSeccion) {
+        currentGrado   = nuevoGrado;
+        currentSeccion = nuevaSeccion;
+        recargar       = true;
+    }
+    currentTipo = nuevoTipo;
+
+    document.getElementById("cardEstudiantes").style.display = "block";
+    document.getElementById("cardEvaluacion").style.display  = "block";
+    document.getElementById("cardResultados").style.display  = "block";
+    document.getElementById("tituloEvaluacion").innerHTML    = currentTipo === "lectura"
+        ? "📖 EVALUACIÓN DE LECTURA (A, B, C, D, N/R)"
+        : "✍️ EVALUACIÓN DE ESCRITURA (Adecuada/Parcial/Inadecuada)";
+
+    if(recargar) cargarDatos();
+    else { renderEvaluacion(); actualizarResultados(); }
+}
+
+/* ═══════════════════════════════════════  EXPORTAR EXCEL REAL (SheetJS)  ═══════════════ */
+function exportarExcel() {
+    if(estudiantes.length === 0) { mostrarToast("⚠️ No hay estudiantes para exportar", "error"); return; }
+
+    const wb  = XLSX.utils.book_new();
+
+    if(currentTipo === "lectura") {
+        const data = lecturaData[currentGrado];
+        if(!data) { mostrarToast("No hay datos para este grado", "error"); return; }
+
+        // Construir cabeceras
+        const headers = ["#", "NOMBRE Y APELLIDOS"];
+        for(let t = 0; t < data.textos.length; t++) {
+            for(let p = 0; p < data.textos[t].preguntas.length; p++) {
+                headers.push(`${data.textos[t].nombre} - P${p+1}`);
+            }
+        }
+        headers.push("CORRECTAS", "INCORRECTAS", "NO RESPONDIÓ", "% LOGRO");
+
+        const rows = [headers];
+        for(let i = 0; i < estudiantes.length; i++) {
+            const row = [i+1, estudiantes[i].nombre || "Sin nombre"];
+            let correctas=0, incorrectas=0, nr=0;
+            let pIdx=0;
+            for(let t=0; t<data.textos.length; t++) {
+                for(let p=0; p<data.textos[t].preguntas.length; p++) {
+                    const resp = respuestasLectura[i]?.[pIdx] || "";
+                    row.push(resp || "N/R");
+                    if(resp==="") nr++;
+                    else if(resp===data.textos[t].preguntas[p]) correctas++;
+                    else incorrectas++;
+                    pIdx++;
+                }
+            }
+            const total = correctas+incorrectas+nr;
+            const pct   = total>0 ? parseFloat((correctas/total*100).toFixed(1)) : 0;
+            row.push(correctas, incorrectas, nr, pct);
+            rows.push(row);
+        }
+
+        // Hoja resumen por texto
+        const resumenHeaders = ["TEXTO", "PREGUNTA", "RESPUESTA CORRECTA", "CORRECTAS", "INCORRECTAS", "N/R", "% LOGRO"];
+        const resumenRows = [resumenHeaders];
+        for(let t=0; t<data.textos.length; t++) {
+            for(let p=0; p<data.textos[t].preguntas.length; p++) {
+                const pGlobal = data.textos.slice(0,t).reduce((a,x)=>a+x.preguntas.length,0)+p;
+                let c=0,inc=0,nr=0;
+                for(let i=0; i<estudiantes.length; i++) {
+                    const r=respuestasLectura[i]?.[pGlobal]||"";
+                    if(r==="") nr++;
+                    else if(r===data.textos[t].preguntas[p]) c++;
+                    else inc++;
+                }
+                const tot=c+inc+nr;
+                resumenRows.push([data.textos[t].nombre, `P${p+1}`, data.textos[t].preguntas[p], c, inc, nr, tot>0?parseFloat((c/tot*100).toFixed(1)):0]);
+            }
+        }
+
+        const ws1 = XLSX.utils.aoa_to_sheet(rows);
+        const ws2 = XLSX.utils.aoa_to_sheet(resumenRows);
+        XLSX.utils.book_append_sheet(wb, ws1, "Respuestas");
+        XLSX.utils.book_append_sheet(wb, ws2, "Análisis por Pregunta");
+
+    } else {
+        const headers = ["#", "NOMBRE Y APELLIDOS", ...escrituraPreguntas, "ADECUADAS", "PARCIALES", "INADECUADAS", "NO RESPONDIDO"];
+        const rows = [headers];
+        for(let i=0; i<estudiantes.length; i++) {
+            const row=[i+1, estudiantes[i].nombre||"Sin nombre"];
+            let a=0,p=0,n=0,nr=0;
+            for(let q=0; q<escrituraPreguntas.length; q++) {
+                const v=respuestasEscritura[i]?.[q]||"NO RESPONDIDO";
+                row.push(v);
+                if(v==="ADECUADA") a++;
+                else if(v==="PARCIAL") p++;
+                else if(v==="INADECUADA") n++;
+                else nr++;
+            }
+            row.push(a,p,n,nr);
+            rows.push(row);
+        }
+        const ws = XLSX.utils.aoa_to_sheet(rows);
+        XLSX.utils.book_append_sheet(wb, ws, "Escritura");
+    }
+
+    // Hoja de metadatos
+    const meta = [
+        ["IE N° 0148 VÍCTOR RAÚL HAYA DE LA TORRE"],
+        ["Evaluación Diagnóstica de Entrada - Comunicación 2026"],
+        ["Grado", currentGrado],
+        ["Sección", currentSeccion],
+        ["Tipo", currentTipo === "lectura" ? "LECTURA" : "ESCRITURA"],
+        ["Total estudiantes", estudiantes.length],
+        ["Generado", new Date().toLocaleString("es-PE")]
+    ];
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(meta), "Info");
+
+    XLSX.writeFile(wb, `Evaluacion_${currentGrado}_${currentSeccion}_${currentTipo}_${Date.now()}.xlsx`);
+    mostrarToast("📊 Archivo Excel exportado correctamente", "success");
+}
+
+/* ═══════════════════════════════════════  IMPORTAR EXCEL  ═══════════════════════════════ */
+function importarExcel(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const data  = new Uint8Array(e.target.result);
+            const wb    = XLSX.read(data, { type: "array" });
+            const ws    = wb.Sheets[wb.SheetNames[0]];
+            const rows  = XLSX.utils.sheet_to_json(ws, { header:1, defval:"" });
+
+            if(rows.length < 2) { mostrarToast("⚠️ El archivo no tiene datos", "error"); return; }
+
+            // Detectar columna de nombres (col 1 = índice 1 si hay # en col 0, o col 0)
+            const headerRow = rows[0].map(h => String(h).trim().toUpperCase());
+            const nameCol   = headerRow.findIndex(h => h.includes("NOMBRE") || h.includes("APELLIDO") || h.includes("ESTUDIANTE"));
+            const colIdx    = nameCol >= 0 ? nameCol : (headerRow[0]==="#" ? 1 : 0);
+
+            const nuevos = [];
+            for(let r = 1; r < rows.length; r++) {
+                const nombre = String(rows[r][colIdx] || "").trim();
+                if(nombre) nuevos.push({ nombre });
+            }
+
+            if(nuevos.length === 0) { mostrarToast("⚠️ No se encontraron nombres en el archivo", "error"); return; }
+
+            // Confirmar si hay estudiantes previos
+            if(estudiantes.length > 0) {
+                if(!confirm(`Se importarán ${nuevos.length} estudiantes. ¿Deseas reemplazar la lista actual?`)) return;
+                respuestasLectura   = {};
+                respuestasEscritura = {};
+            }
+
+            estudiantes = nuevos;
+            renderEstudiantes();
+            renderEvaluacion();
+            actualizarResultados();
+            mostrarToast(`📥 ${nuevos.length} estudiantes importados correctamente`, "success");
+        } catch(err) {
+            mostrarToast("❌ Error al leer el archivo: " + err.message, "error");
+        }
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+/* ═══════════════════════════════════════  EVENTOS  ══════════════════════════════════════ */
+document.getElementById("btnGenerar").onclick        = generarTabla;
+document.getElementById("btnGuardar").onclick        = guardarTodo;
+document.getElementById("btnExportarExcel").onclick  = exportarExcel;
+
+document.getElementById("btnAgregarEstudiante").onclick = () => {
+    estudiantes.push({ nombre: "" });
+    renderEstudiantes();
+    renderEvaluacion();
+    actualizarResultados();
+};
+
+document.getElementById("btnImportar").onclick = () => {
+    document.getElementById("inputImportar").click();
+};
+
+document.getElementById("inputImportar").onchange = (e) => {
+    const file = e.target.files[0];
+    if(file) { importarExcel(file); e.target.value = ""; }
+};
+
+// TABS
+document.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.onclick = () => {
+        document.querySelectorAll(".tab-btn").forEach(b  => b.classList.remove("active"));
+        document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active"));
+        btn.classList.add("active");
+        const tabId = "tab" + btn.getAttribute("data-tab");
+        const pane  = document.getElementById(tabId);
+        if(pane) pane.classList.add("active");
+        actualizarResultados();
+    };
+});
+</script>
+</body>
+</html>
