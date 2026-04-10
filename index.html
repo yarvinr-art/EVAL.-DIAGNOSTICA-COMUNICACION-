@@ -84,7 +84,14 @@
         /* ── VIRTUAL SCROLL ── */
         .virtual-scroll-container { max-height: 600px; overflow-y: auto; border-radius: 12px; }
 
-        @media (max-width: 900px) { .main { padding: 16px; } .charts-row { grid-template-columns: 1fr; } .student-input { width: 140px !important; } }
+        /* ── NIVELES DE LOGRO ── */
+        .nivel-AD { background: rgba(99,102,241,0.2); color: #818cf8; border: 1px solid rgba(99,102,241,0.4); padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 11px; }
+        .nivel-A  { background: rgba(16,185,129,0.2); color: #10b981; border: 1px solid rgba(16,185,129,0.4); padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 11px; }
+        .nivel-B  { background: rgba(251,191,36,0.2);  color: #fbbf24; border: 1px solid rgba(251,191,36,0.4);  padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 11px; }
+        .nivel-C  { background: rgba(239,68,68,0.2);   color: #ef4444; border: 1px solid rgba(239,68,68,0.4);   padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 11px; }
+        .charts-row-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-bottom: 28px; }
+
+        @media (max-width: 900px) { .main { padding: 16px; } .charts-row { grid-template-columns: 1fr; } .charts-row-3 { grid-template-columns: 1fr; } .student-input { width: 140px !important; } }
         @media print { body { background: white; color: black; } .btn, .btn-group, .status-badge, .footer { display: none; } }
     </style>
 </head>
@@ -136,7 +143,7 @@
                 <button class="btn btn-success"   id="btnGuardar">💾 GUARDAR</button>
                 <button class="btn btn-secondary" id="btnExportarExcel">📊 EXPORTAR EXCEL</button>
                 <button class="btn btn-info"      id="btnImportar">📥 IMPORTAR EXCEL</button>
-                <input type="file" id="inputImportar" accept=".xlsx,.xls,.csv">
+                <input type="file" id="inputImportar" accept=".xlsx,.xlsm,.xls,.csv">
             </div>
         </div>
     </div>
@@ -175,6 +182,10 @@
                 <div class="chart-card"><div class="chart-title" id="chartTitlePorcentaje">PORCENTAJE DE RESPUESTAS</div><div class="chart-container"><canvas id="chartPorcentaje"></canvas></div></div>
                 <div class="chart-card"><div class="chart-title" id="chartTitleCantidad">CANTIDAD DE RESPUESTAS</div><div class="chart-container"><canvas id="chartCantidad"></canvas></div></div>
             </div>
+            <div class="charts-row-3">
+                <div class="chart-card"><div class="chart-title" id="chartTitleNiveles">🏅 NIVELES DE LOGRO POR SECCIÓN</div><div class="chart-container"><canvas id="chartNiveles"></canvas></div></div>
+                <div class="chart-card" id="cardResumenNiveles"><div class="chart-title">📊 DISTRIBUCIÓN DE NIVELES</div><div id="resumenNivelesHTML" style="padding-top:8px;"></div></div>
+            </div>
         </div>
         <div id="tabRefuerzo" class="tab-pane"><div id="contenidoRefuerzo"></div></div>
         <div id="tabDetalle" class="tab-pane"><div id="contenidoDetalle"></div></div>
@@ -184,7 +195,7 @@
 <div class="footer">
     <div class="footer-name">Elaborado por: Yarvin RS</div>
     <div class="footer-cargo">Profesor de innovación pedagógica</div>
-    <div class="footer-version">Sistema optimizado v2 | Datos guardados localmente | Soporte hasta 800 estudiantes</div>
+    <div class="footer-version">Sistema optimizado v3 | Firebase en la nube | Niveles AD/A/B/C | Soporte hasta 800 estudiantes</div>
 </div>
 
 <!-- Firebase compat (debe cargarse antes del script principal) -->
@@ -243,6 +254,7 @@ let currentSeccion = "A";
 let currentTipo    = "lectura";
 let chartPorcentaje= null;
 let chartCantidad  = null;
+let chartNiveles   = null;
 
 /* ═══════════════════════════════════════  TOAST  ════════════════════════════════════════ */
 function mostrarToast(msg, tipo = "default") {
@@ -259,6 +271,59 @@ function mostrarToast(msg, tipo = "default") {
 function destroyCharts() {
     if(chartPorcentaje) { chartPorcentaje.destroy(); chartPorcentaje = null; }
     if(chartCantidad)   { chartCantidad.destroy();   chartCantidad   = null; }
+    if(chartNiveles)    { chartNiveles.destroy();     chartNiveles    = null; }
+}
+
+/* ═══════════════════════════════════════  NIVEL DE LOGRO  ═══════════════════════════════ */
+function getNivelLogro(pct) {
+    if(pct >= 90) return "AD";
+    if(pct >= 66) return "A";
+    if(pct >= 50) return "B";
+    return "C";
+}
+function nivelColor(nivel) {
+    return { AD:"#818cf8", A:"#10b981", B:"#fbbf24", C:"#ef4444" }[nivel] || "#94a3b8";
+}
+function renderChartNiveles(conteo) {
+    // conteo = { AD:n, A:n, B:n, C:n }
+    const labels = ["🏅 AD", "✅ A", "⚠️ B", "❌ C"];
+    const valores = [conteo.AD||0, conteo.A||0, conteo.B||0, conteo.C||0];
+    const colores = ["#818cf8","#10b981","#fbbf24","#ef4444"];
+    const total   = valores.reduce((a,b)=>a+b,0);
+
+    document.getElementById("chartTitleNiveles").innerHTML =
+        `🏅 NIVELES DE LOGRO — ${currentGrado} "${currentSeccion}"`;
+
+    if(chartNiveles) { chartNiveles.destroy(); chartNiveles = null; }
+    chartNiveles = new Chart(document.getElementById("chartNiveles"), {
+        type: "doughnut",
+        data: { labels, datasets:[{ data: valores, backgroundColor: colores, borderWidth: 2, borderColor:"#1a1d27" }] },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+                legend: { position:"bottom", labels:{ color:"#94a3b8", font:{ size:12 } } },
+                tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw} estudiantes (${total>0?(ctx.raw/total*100).toFixed(1):0}%)` } }
+            }
+        }
+    });
+
+    // Tarjetas resumen
+    const niveles = ["AD","A","B","C"];
+    const iconos  = ["🏅","✅","⚠️","❌"];
+    const desc    = ["Logro destacado (≥90%)","Logro esperado (66–89%)","En proceso (50–65%)","En inicio (<50%)"];
+    let html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">';
+    niveles.forEach((n,i) => {
+        const cnt = conteo[n]||0;
+        const pct = total>0?(cnt/total*100).toFixed(1):0;
+        html += `<div class="stat-box" style="border-left:3px solid ${colores[i]};">
+            <div style="font-size:22px;font-weight:800;color:${colores[i]};">${cnt}</div>
+            <div style="font-size:12px;font-weight:700;color:${colores[i]};">${iconos[i]} ${n}</div>
+            <div style="font-size:10px;color:#5b6a8c;margin-top:2px;">${desc[i]}</div>
+            <div style="font-size:11px;color:#94a3b8;margin-top:4px;">${pct}% del aula</div>
+        </div>`;
+    });
+    html += '</div>';
+    document.getElementById("resumenNivelesHTML").innerHTML = html;
 }
 
 /* ═══════════════════════════════════════  RENDER ESTUDIANTES  ═══════════════════════════ */
@@ -350,18 +415,19 @@ function renderEvaluacion() {
             html += `<th>${escHtml(data.textos[t].nombre)}<br>P${p+1}<br><small style="color:#10b981;font-size:9px;">✓${data.textos[t].preguntas[p]}</small></th>`;
         }
     }
-    html += '</tr></thead><tbody>';
+    html += '<th>% LOGRO</th><th>NIVEL</th></tr></thead><tbody>';
 
+    const totalPregs = data.textos.reduce((a,t)=>a+t.preguntas.length,0);
     for(let estIdx = 0; estIdx < estudiantes.length; estIdx++) {
         html += `<tr><td style="font-weight:bold;">${escHtml(estudiantes[estIdx].nombre || 'Sin nombre')}</td>`;
-        let pIdx = 0;
+        let pIdx = 0, correctas = 0, respondidas = 0;
         for(let t = 0; t < data.textos.length; t++) {
             for(let p = 0; p < data.textos[t].preguntas.length; p++) {
                 const val = respuestasLectura[estIdx]?.[pIdx] || "";
                 const correcta = data.textos[t].preguntas[p];
                 let bg = "";
-                if(val && val === correcta) bg = 'style="background:rgba(16,185,129,0.12);"';
-                else if(val && val !== correcta) bg = 'style="background:rgba(239,68,68,0.10);"';
+                if(val && val === correcta) { bg = 'style="background:rgba(16,185,129,0.12);"'; correctas++; respondidas++; }
+                else if(val && val !== correcta) { bg = 'style="background:rgba(239,68,68,0.10);"'; respondidas++; }
                 html += `<td ${bg}><select onchange="cambiarRespuestaLectura(${estIdx},${pIdx},this.value)">
                     <option value="">N/R</option>
                     <option value="A" ${val==='A'?'selected':''}>A</option>
@@ -372,6 +438,11 @@ function renderEvaluacion() {
                 pIdx++;
             }
         }
+        const pct = totalPregs > 0 ? (correctas / totalPregs * 100) : 0;
+        const nivel = respondidas > 0 ? getNivelLogro(pct) : "—";
+        const pctStr = respondidas > 0 ? pct.toFixed(1) + "%" : "—";
+        html += `<td style="font-weight:700;color:#f97316;">${pctStr}</td>`;
+        html += `<td><span class="nivel-${nivel}">${nivel}</span></td>`;
         html += '</tr>';
     }
     html += '</tbody></table>';
@@ -429,6 +500,7 @@ function renderResultadosLectura() {
 
     const totalPreguntas = data.textos.reduce((a,t)=>a+t.preguntas.length,0);
     const refuerzoList = [], okList = [], sinDatos = [];
+    const nivelesConteo = { AD:0, A:0, B:0, C:0 };
     for(let estIdx = 0; estIdx < estudiantes.length; estIdx++) {
         let inc = 0, cor = 0, nr = 0; let pIdx = 0;
         for(let t = 0; t < data.textos.length; t++) {
@@ -446,14 +518,17 @@ function renderResultadosLectura() {
         const pctInc = (inc / totalPreguntas) * 100;
         const pctNR  = (nr  / totalPreguntas) * 100;
         const pctCor = (cor / totalPreguntas) * 100;
+        const nivelEst = getNivelLogro(pctCor);
+        nivelesConteo[nivelEst]++;
         // Criterio: >50% incorrectas O >33% no respondidas
         if(pctInc > 50 || (pctInc + pctNR) > 50) {
             const nivel = pctCor >= 40 ? '🟡 RIESGO' : '🔴 CRÍTICO';
-            refuerzoList.push({ nombre, inc, cor, nr, pctCor: pctCor.toFixed(0), nivel });
+            refuerzoList.push({ nombre, inc, cor, nr, pctCor: pctCor.toFixed(0), nivel, nivelLogro: nivelEst });
         } else {
-            okList.push({ nombre, inc, cor, nr, pctCor: pctCor.toFixed(0) });
+            okList.push({ nombre, inc, cor, nr, pctCor: pctCor.toFixed(0), nivelLogro: nivelEst });
         }
     }
+    renderChartNiveles(nivelesConteo);
 
     document.getElementById("contenidoRefuerzo").innerHTML = `
         <div class="refuerzo-card">
@@ -469,7 +544,7 @@ function renderResultadosLectura() {
             </div>
             ${refuerzoList.length > 0 ? `
             <table class="data-table" style="margin-bottom:20px;">
-                <thead><tr><th>#</th><th>ESTUDIANTE</th><th>✅ CORRECTAS</th><th>❌ INCORRECTAS</th><th>📭 N/R</th><th>% LOGRO</th><th>NIVEL</th></tr></thead>
+                <thead><tr><th>#</th><th>ESTUDIANTE</th><th>✅ CORRECTAS</th><th>❌ INCORRECTAS</th><th>📭 N/R</th><th>% LOGRO</th><th>NIVEL LOGRO</th><th>REFUERZO</th></tr></thead>
                 <tbody>${refuerzoList.map((e,i)=>`<tr>
                     <td>${i+1}</td>
                     <td style="text-align:left;">${escHtml(e.nombre)}</td>
@@ -477,6 +552,7 @@ function renderResultadosLectura() {
                     <td style="color:#ef4444;">${e.inc}</td>
                     <td style="color:#6b7280;">${e.nr}</td>
                     <td><strong style="color:#f97316;">${e.pctCor}%</strong></td>
+                    <td><span class="nivel-${e.nivelLogro}">${e.nivelLogro}</span></td>
                     <td>${e.nivel}</td>
                 </tr>`).join('')}</tbody>
             </table>` : '<p style="color:#10b981;padding:12px 0;">✅ Ningún estudiante requiere refuerzo con el criterio actual.</p>'}
@@ -484,8 +560,8 @@ function renderResultadosLectura() {
             <details style="margin-top:12px;">
                 <summary style="cursor:pointer;color:#10b981;font-weight:600;padding:8px 0;">✅ ESTUDIANTES EN NIVEL ESPERADO (${okList.length})</summary>
                 <table class="data-table" style="margin-top:8px;">
-                    <thead><tr><th>#</th><th>ESTUDIANTE</th><th>✅ CORRECTAS</th><th>❌ INCORRECTAS</th><th>% LOGRO</th></tr></thead>
-                    <tbody>${okList.map((e,i)=>`<tr><td>${i+1}</td><td style="text-align:left;">${escHtml(e.nombre)}</td><td style="color:#10b981;">${e.cor}</td><td style="color:#ef4444;">${e.inc}</td><td><strong style="color:#10b981;">${e.pctCor}%</strong></td></tr>`).join('')}</tbody>
+                    <thead><tr><th>#</th><th>ESTUDIANTE</th><th>✅ CORRECTAS</th><th>❌ INCORRECTAS</th><th>% LOGRO</th><th>NIVEL LOGRO</th></tr></thead>
+                    <tbody>${okList.map((e,i)=>`<tr><td>${i+1}</td><td style="text-align:left;">${escHtml(e.nombre)}</td><td style="color:#10b981;">${e.cor}</td><td style="color:#ef4444;">${e.inc}</td><td><strong style="color:#10b981;">${e.pctCor}%</strong></td><td><span class="nivel-${e.nivelLogro}">${e.nivelLogro}</span></td></tr>`).join('')}</tbody>
                 </table>
             </details>` : ''}
         </div>`;
@@ -541,6 +617,7 @@ function renderResultadosEscritura() {
 
     const totalCriterios = escrituraPreguntas.length;
     const refuerzoListE = [], okListE = [];
+    const nivelesConteoE = { AD:0, A:0, B:0, C:0 };
     for(let i = 0; i < estudiantes.length; i++) {
         let adecuada=0, parcial=0, inadecuada=0, nr=0;
         for(let p = 0; p < totalCriterios; p++) {
@@ -554,15 +631,20 @@ function renderResultadosEscritura() {
         const respondidos = adecuada + parcial + inadecuada;
         if(respondidos === 0) continue;
 
+        const pctAdec    = (adecuada / totalCriterios) * 100;
+        const nivelEst   = getNivelLogro(pctAdec);
+        nivelesConteoE[nivelEst]++;
+
         // Criterio: requiere refuerzo si inadecuada+NR > 2 criterios  O  parcial+inadecuada > 50%
         const pctInadec  = (inadecuada / totalCriterios) * 100;
         const pctParcial = (parcial    / totalCriterios) * 100;
         const necesita   = (inadecuada + nr) >= 2 || (pctInadec + pctParcial) > 50;
         let nivel = '🟡 RIESGO';
         if(inadecuada >= 3 || (inadecuada + nr) >= 4) nivel = '🔴 CRÍTICO';
-        if(necesita) refuerzoListE.push({ nombre, adecuada, parcial, inadecuada, nr, nivel });
-        else         okListE.push({ nombre, adecuada, parcial, inadecuada });
+        if(necesita) refuerzoListE.push({ nombre, adecuada, parcial, inadecuada, nr, nivel, nivelLogro: nivelEst });
+        else         okListE.push({ nombre, adecuada, parcial, inadecuada, nivelLogro: nivelEst });
     }
+    renderChartNiveles(nivelesConteoE);
 
     document.getElementById("contenidoRefuerzo").innerHTML = `
         <div class="refuerzo-card">
@@ -578,7 +660,7 @@ function renderResultadosEscritura() {
             </div>
             ${refuerzoListE.length > 0 ? `
             <table class="data-table" style="margin-bottom:20px;">
-                <thead><tr><th>#</th><th>ESTUDIANTE</th><th>✅ ADECUADA</th><th>⚠️ PARCIAL</th><th>❌ INADECUADA</th><th>📭 N/R</th><th>NIVEL</th></tr></thead>
+                <thead><tr><th>#</th><th>ESTUDIANTE</th><th>✅ ADECUADA</th><th>⚠️ PARCIAL</th><th>❌ INADECUADA</th><th>📭 N/R</th><th>NIVEL LOGRO</th><th>REFUERZO</th></tr></thead>
                 <tbody>${refuerzoListE.map((e,i)=>`<tr>
                     <td>${i+1}</td>
                     <td style="text-align:left;">${escHtml(e.nombre)}</td>
@@ -586,6 +668,7 @@ function renderResultadosEscritura() {
                     <td style="color:#fbbf24;">${e.parcial}</td>
                     <td style="color:#ef4444;">${e.inadecuada}</td>
                     <td style="color:#6b7280;">${e.nr}</td>
+                    <td><span class="nivel-${e.nivelLogro}">${e.nivelLogro}</span></td>
                     <td>${e.nivel}</td>
                 </tr>`).join('')}</tbody>
             </table>` : '<p style="color:#10b981;padding:12px 0;">✅ Ningún estudiante requiere refuerzo con el criterio actual.</p>'}
@@ -593,8 +676,8 @@ function renderResultadosEscritura() {
             <details style="margin-top:12px;">
                 <summary style="cursor:pointer;color:#10b981;font-weight:600;padding:8px 0;">✅ ESTUDIANTES EN NIVEL ESPERADO (${okListE.length})</summary>
                 <table class="data-table" style="margin-top:8px;">
-                    <thead><tr><th>#</th><th>ESTUDIANTE</th><th>✅ ADECUADA</th><th>⚠️ PARCIAL</th><th>❌ INADECUADA</th></tr></thead>
-                    <tbody>${okListE.map((e,i)=>`<tr><td>${i+1}</td><td style="text-align:left;">${escHtml(e.nombre)}</td><td style="color:#10b981;">${e.adecuada}</td><td style="color:#fbbf24;">${e.parcial}</td><td style="color:#ef4444;">${e.inadecuada}</td></tr>`).join('')}</tbody>
+                    <thead><tr><th>#</th><th>ESTUDIANTE</th><th>✅ ADECUADA</th><th>⚠️ PARCIAL</th><th>❌ INADECUADA</th><th>NIVEL LOGRO</th></tr></thead>
+                    <tbody>${okListE.map((e,i)=>`<tr><td>${i+1}</td><td style="text-align:left;">${escHtml(e.nombre)}</td><td style="color:#10b981;">${e.adecuada}</td><td style="color:#fbbf24;">${e.parcial}</td><td style="color:#ef4444;">${e.inadecuada}</td><td><span class="nivel-${e.nivelLogro}">${e.nivelLogro}</span></td></tr>`).join('')}</tbody>
                 </table>
             </details>` : ''}
         </div>`;
